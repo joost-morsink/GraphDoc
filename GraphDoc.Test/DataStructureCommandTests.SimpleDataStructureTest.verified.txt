@@ -1,0 +1,11 @@
+﻿graph TD
+    Person -->|FirstName| String
+    Person -->|LastName| String
+    Person -->|BirthDate| DateOnly
+    Person -->|Addresses| Address
+    Address -->|Street| String
+    Address -->|Number| String
+    Address -->|City| String
+    Address -->|Zip| String
+    Address -->|Country| String
+
