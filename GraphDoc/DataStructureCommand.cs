@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Xml.Linq;
@@ -18,6 +17,8 @@ public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string
             .ToCaseInsensitiveDictionary();
         
         var dll = parameters.GetRequired(nameof(Dll),"d");
+        if(!Path.IsPathRooted(dll))
+            dll = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dll);
         var className = parameters.GetRequired(nameof(ClassName),"c");
         var @namespace = parameters.GetOptional(nameof(Namespace), "n");
         var serializer = parameters.GetOptional(nameof(Serializer), "s");
@@ -76,13 +77,18 @@ public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string
             }
         }
 
+        Type UnNullable(Type type)
+            => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
+                ? type.GetGenericArguments()[0]
+                : type;
+
         Type UnderlyingType(Type type)
             => type == typeof(string) 
                 ? type
-                : (from itf in type.GetInterfaces()
+                : UnNullable((from itf in type.GetInterfaces()
                     let ga = itf.GetGenericArguments()
                     where ga.Length == 1 && itf.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                    select ga[0]).FirstOrDefault() ?? type;
+                    select ga[0]).FirstOrDefault() ?? type);
         
         string? GetDoc(string name)
             => documentation

@@ -16,7 +16,7 @@ public class Person
     /// <summary>
     /// The person's birth date.
     /// </summary>
-    public DateOnly BirthDate { get; set; }
+    public DateOnly? BirthDate { get; set; }
     /// <summary>
     /// The person's addresses.
     /// </summary>
