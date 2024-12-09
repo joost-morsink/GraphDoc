@@ -48,7 +48,7 @@ public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string
         
         var type = asm.ExportedTypes
             .FirstOrDefault(t => string.Equals(t.Name, ClassName, StringComparison.OrdinalIgnoreCase)
-                && Namespace is null || string.Equals(t.Namespace, Namespace, StringComparison.OrdinalIgnoreCase));
+                && (Namespace is null || string.Equals(t.Namespace, Namespace, StringComparison.OrdinalIgnoreCase)));
         if (type is null)
             throw new GraphDocException("Could not load type.");
         
@@ -72,11 +72,28 @@ public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string
             {
                 var innerPropDoc = GetDoc($"P:{innerType.FullName}.{prop.Name}");
                 var underlying = UnderlyingType(prop.PropertyType);
-                result.Add(new (new(innerType.Name, innerDoc),underlying.Name, new( prop.Name, innerPropDoc)));
+                if(IsTerminal(underlying))
+                    result.Add(new (new (innerType.Name,innerDoc), new ($"{ShortName(prop.PropertyType)} {prop.Name}",innerPropDoc), ""));
+                else
+                    result.Add(new (new(innerType.Name, innerDoc), underlying.Name, new(prop.Name, innerPropDoc)));
                 Inner(underlying);
             }
         }
 
+        string ShortName(Type type)
+            => type.GetGenericArguments().Length == 0
+                ? type.Name
+                : $"{type.Name.Split('`')[0]}<{string.Join(", ", type.GetGenericArguments().Select(ShortName))}>";
+        
+        bool IsTerminal(Type type)
+            => UnNullable(type) switch
+            {
+                Type t when t.IsPrimitive || t == typeof(string) => true,
+                Type t when t.IsEnum => true,
+                Type t when t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>) => IsTerminal(t.GetGenericArguments()[0]),
+                Type t when t.Namespace == "System" => true,
+                _ => false
+            };
         Type UnNullable(Type type)
             => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
                 ? type.GetGenericArguments()[0]

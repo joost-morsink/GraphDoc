@@ -1,11 +1,11 @@
-﻿graph TD
-    Person["Person: A natural person"] -->|"FirstName: The person's first name."| String
-    Person["Person: A natural person"] -->|"LastName: The person's last name."| String
-    Person["Person: A natural person"] -->|"BirthDate: The person's birth date."| DateOnly
+﻿graph LR
+    Person["Person: A natural person"] --> String_FirstName["String FirstName: The person's first name."]
+    Person["Person: A natural person"] --> String_LastName["String LastName: The person's last name."]
+    Person["Person: A natural person"] --> Nullable_DateOnly__BirthDate["Nullable&lt;DateOnly> BirthDate: The person's birth date."]
     Person["Person: A natural person"] -->|"Addresses: The person's addresses."| Address
-    Address["Address: A postal address"] -->|"Street: The street name."| String
-    Address["Address: A postal address"] -->|"Number: The street number."| String
-    Address["Address: A postal address"] -->|"City: The city."| String
-    Address["Address: A postal address"] -->|"Zip: The postal code."| String
-    Address["Address: A postal address"] -->|"Country: The country."| String
+    Address["Address: A postal address"] --> String_Street["String Street: The street name."]
+    Address["Address: A postal address"] --> String_Number["String Number: The street number."]
+    Address["Address: A postal address"] --> String_City["String City: The city."]
+    Address["Address: A postal address"] --> String_Zip["String Zip: The postal code."]
+    Address["Address: A postal address"] --> String_Country["String Country: The country."]
 

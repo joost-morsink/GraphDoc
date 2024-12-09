@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
-        <VersionPrefix>0.2.0</VersionPrefix>
+        <VersionPrefix>0.3.0</VersionPrefix>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>graphdoc</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>

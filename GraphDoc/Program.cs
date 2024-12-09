@@ -1,11 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.Compression;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-
-namespace GraphDoc;
+﻿namespace GraphDoc;
 
 public class Program
 {
