@@ -1,11 +1,11 @@
 ﻿graph LR
+    Person["Person: A natural person"] -->|"List&lt;Address> Addresses: The person's addresses."| Address["Address: A postal address"]
+    Address["Address: A postal address"] --> String_City["String City: The city."]
+    Address["Address: A postal address"] --> String_Country["String Country: The country."]
+    Address["Address: A postal address"] --> String_Number["String Number: The street number."]
+    Address["Address: A postal address"] --> String_Street["String Street: The street name."]
+    Address["Address: A postal address"] --> String_Zip["String Zip: The postal code."]
+    Person["Person: A natural person"] --> Nullable_DateOnly__BirthDate["Nullable&lt;DateOnly> BirthDate: The person's birth date."]
     Person["Person: A natural person"] --> String_FirstName["String FirstName: The person's first name."]
     Person["Person: A natural person"] --> String_LastName["String LastName: The person's last name."]
-    Person["Person: A natural person"] --> Nullable_DateOnly__BirthDate["Nullable&lt;DateOnly> BirthDate: The person's birth date."]
-    Person["Person: A natural person"] -->|"Addresses: The person's addresses."| Address
-    Address["Address: A postal address"] --> String_Street["String Street: The street name."]
-    Address["Address: A postal address"] --> String_Number["String Number: The street number."]
-    Address["Address: A postal address"] --> String_City["String City: The city."]
-    Address["Address: A postal address"] --> String_Zip["String Zip: The postal code."]
-    Address["Address: A postal address"] --> String_Country["String Country: The country."]
 

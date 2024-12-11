@@ -1,10 +1,10 @@
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Xml.Linq;
 
 namespace GraphDoc;
-
-public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string ClassName, string? Namespace) : LinkCommand(Serializer), ICommandDef
+public class DataStructureCommand(IStructureSerializer Serializer, string Dll, string ClassName, string? Namespace) : StructureCommand(Serializer), ICommandDef
 {
     private readonly string Directory = Path.GetDirectoryName(Dll)!;
     public static string Name => "datastructure";
@@ -24,10 +24,10 @@ public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string
         var serializer = parameters.GetOptional(nameof(Serializer), "s");
         
         
-        return new DataStructureCommand(ILinkSerializer.Create(serializer), dll, className, @namespace);
+        return new DataStructureCommand(IStructureSerializer.Create(serializer), dll, className, @namespace);
     }
     
-    protected override async Task<IEnumerable<Link>> GetLinks()
+    protected override async Task<Structure> GetStructure()
     {
         await Task.Yield();
         AssemblyLoadContext.Default.Resolving += ResolveAssembly;
@@ -52,34 +52,31 @@ public class DataStructureCommand(ILinkSerializer Serializer, string Dll, string
         if (type is null)
             throw new GraphDocException("Could not load type.");
         
-        return GetLinks(type, xml);
+        return GetStructure(type, xml);
     }
 
-    public IEnumerable<Link> GetLinks(Type type, XElement? documentation) 
+    private Structure GetStructure(Type type, XElement? documentation) 
     {
-        var done = new HashSet<Type>();
-        var result = new List<Link>();
-        Inner(type);
-        return result;
+        return Inner(type);
         
-        void Inner(Type innerType)
+        Structure Inner(Type innerType)
         {
-            if (done.Contains(innerType) || innerType.Namespace == "System")
-                return;
-            done.Add(innerType);
             var innerDoc = GetDoc($"T:{innerType.FullName}");
-            foreach (var prop in innerType.GetProperties())
-            {
-                var innerPropDoc = GetDoc($"P:{innerType.FullName}.{prop.Name}");
-                var underlying = UnderlyingType(prop.PropertyType);
-                if(IsTerminal(underlying))
-                    result.Add(new (new (innerType.Name,innerDoc), new ($"{ShortName(prop.PropertyType)} {prop.Name}",innerPropDoc), ""));
-                else
-                    result.Add(new (new(innerType.Name, innerDoc), underlying.Name, new(prop.Name, innerPropDoc)));
-                Inner(underlying);
-            }
-        }
+            var desc = new Descriptor(innerType.Name, innerDoc);
+            var props = innerType.GetProperties()
+                .Select(prop =>
+                {
+                    var innerPropDoc = GetDoc($"P:{innerType.FullName}.{prop.Name}");
+                    var underlying = UnderlyingType(prop.PropertyType);
+                    var propDesc = new Descriptor($"{ShortName(prop.PropertyType)} {prop.Name}", innerPropDoc);
+                    if (IsTerminal(underlying))
+                        return (propDesc,
+                            new Structure.Leaf(new($"{ShortName(prop.PropertyType)} {prop.Name}", innerPropDoc)));
+                    return (propDesc, Inner(underlying));
+                });
+            return new Structure.Dict(desc, props.ToImmutableDictionary(x => x.Item1, x => x.Item2));
 
+        }
         string ShortName(Type type)
             => type.GetGenericArguments().Length == 0
                 ? type.Name

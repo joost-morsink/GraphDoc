@@ -2,26 +2,26 @@ using System.Collections.Immutable;
 
 namespace GraphDoc;
 
-public interface ILinkSerializer
+public interface IGraphSerializer
 {
     string LeadingTrivia { get; }
     string TrailingTrivia { get; }
     string Serialize(Link link);
-
-    private static readonly ImmutableDictionary<string, Func<ILinkSerializer>> Serializers
-        = ImmutableDictionary.Create<string, Func<ILinkSerializer>>(StringComparer.OrdinalIgnoreCase)
+    
+    private static readonly ImmutableDictionary<string, Func<IGraphSerializer>> Serializers
+        = ImmutableDictionary.Create<string, Func<IGraphSerializer>>(StringComparer.OrdinalIgnoreCase)
             .Add("simpleMermaid", () => SimpleMermaid)
             .Add("mermaid", () => Mermaid);
 
-    public static ILinkSerializer Create(string? str)
+    public static IGraphSerializer Create(string? str)
         => str is not null && Serializers.TryGetValue(str, out var serializerCreator)
             ? serializerCreator()
             : SimpleMermaid;
 
-    public static ILinkSerializer SimpleMermaid => new SimpleMermaidImpl();
-    public static ILinkSerializer Mermaid => new MermaidImpl();
+    public static IGraphSerializer SimpleMermaid => new SimpleMermaidImpl();
+    public static IGraphSerializer Mermaid => new MermaidImpl();
 
-    private class MermaidImpl : ILinkSerializer
+    private class MermaidImpl : IGraphSerializer
     {
         public string LeadingTrivia => "graph LR";
         public string TrailingTrivia => "";
@@ -33,7 +33,7 @@ public interface ILinkSerializer
                 : $"{ComponentName(descriptor)}[\"{Escape(descriptor.Name)}: {Escape(descriptor.Description)}\"]";
     }
 
-    private class SimpleMermaidImpl : ILinkSerializer
+    private class SimpleMermaidImpl : IGraphSerializer
     {
         public string LeadingTrivia => "graph LR";
         public string TrailingTrivia => "";

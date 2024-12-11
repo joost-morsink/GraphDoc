@@ -1,11 +1,11 @@
 ﻿graph LR
+    Person -->|"List&lt;Address> Addresses"| Address
+    Address --> String_City["String City"]
+    Address --> String_Country["String Country"]
+    Address --> String_Number["String Number"]
+    Address --> String_Street["String Street"]
+    Address --> String_Zip["String Zip"]
+    Person --> Nullable_DateOnly__BirthDate["Nullable&lt;DateOnly> BirthDate"]
     Person --> String_FirstName["String FirstName"]
     Person --> String_LastName["String LastName"]
-    Person --> Nullable_DateOnly__BirthDate["Nullable&lt;DateOnly> BirthDate"]
-    Person -->|"Addresses"| Address
-    Address --> String_Street["String Street"]
-    Address --> String_Number["String Number"]
-    Address --> String_City["String City"]
-    Address --> String_Zip["String Zip"]
-    Address --> String_Country["String Country"]
 
